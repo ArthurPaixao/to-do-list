@@ -53,6 +53,7 @@ fun ListaTarefasScreen(
 ) {
     val tarefas by viewModel.tarefas.collectAsStateWithLifecycle()
     val tarefaParaExcluir by viewModel.tarefaParaExcluir.collectAsStateWithLifecycle()
+    val confirmandoExclusaoConcluidas by viewModel.confirmandoExclusaoConcluidas.collectAsStateWithLifecycle()
 
     ListaTarefasContent(
         tarefas = tarefas,
@@ -64,7 +65,11 @@ fun ListaTarefasScreen(
         onDeletar = { tarefa -> viewModel.solicitarExclusao(tarefa) },
         tarefaParaExcluir = tarefaParaExcluir,
         onConfirmarExclusao = viewModel::confirmarExclusao,
-        onCancelarExclusao = viewModel::cancelarExclusao
+        onCancelarExclusao = viewModel::cancelarExclusao,
+        confirmandoExclusaoConcluidas = confirmandoExclusaoConcluidas,
+        onLimparConcluidas = viewModel::solicitarExclusaoConcluidas,
+        onConfirmarExclusaoConcluidas = viewModel::confirmarExclusaoConcluidas,
+        onCancelarExclusaoConcluidas = viewModel::cancelarExclusaoConcluidas
     )
 }
 
@@ -78,8 +83,14 @@ fun ListaTarefasContent(
     onDeletar: (Tarefa) -> Unit,
     tarefaParaExcluir: Tarefa? = null,
     onConfirmarExclusao: () -> Unit = {},
-    onCancelarExclusao: () -> Unit = {}
+    onCancelarExclusao: () -> Unit = {},
+    confirmandoExclusaoConcluidas: Boolean = false,
+    onLimparConcluidas: () -> Unit = {},
+    onConfirmarExclusaoConcluidas: () -> Unit = {},
+    onCancelarExclusaoConcluidas: () -> Unit = {}
 ) {
+    val concluidas = tarefas.filter { it.concluida }
+
     if (tarefaParaExcluir != null) {
         ConfirmarExclusaoDialog(
             tarefa = tarefaParaExcluir,
@@ -88,9 +99,26 @@ fun ListaTarefasContent(
         )
     }
 
+    if (confirmandoExclusaoConcluidas && concluidas.isNotEmpty()) {
+        ConfirmarExclusaoConcluidasDialog(
+            concluidas = concluidas,
+            onConfirmar = onConfirmarExclusaoConcluidas,
+            onCancelar = onCancelarExclusaoConcluidas
+        )
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Minhas Tarefas") })
+            TopAppBar(
+                title = { Text("Minhas Tarefas") },
+                actions = {
+                    if (concluidas.isNotEmpty()) {
+                        TextButton(onClick = onLimparConcluidas) {
+                            Text("Limpar concluídas")
+                        }
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNovaTarefa) {
@@ -217,6 +245,53 @@ private fun ConfirmarExclusaoDialog(
     )
 }
 
+@Composable
+private fun ConfirmarExclusaoConcluidasDialog(
+    concluidas: List<Tarefa>,
+    onConfirmar: () -> Unit,
+    onCancelar: () -> Unit
+) {
+    val mensagem = if (concluidas.size == 1) {
+        "A tarefa concluída abaixo será excluída permanentemente:"
+    } else {
+        "As ${concluidas.size} tarefas concluídas abaixo serão excluídas permanentemente:"
+    }
+
+    AlertDialog(
+        onDismissRequest = onCancelar,
+        icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+        title = { Text("Excluir tarefas concluídas?") },
+        text = {
+            Column {
+                Text(mensagem)
+                Spacer(modifier = Modifier.height(8.dp))
+                concluidas.forEach { tarefa ->
+                    Text(
+                        text = "• ${tarefa.titulo}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmar,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("Excluir")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancelar) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
 @Preview(showBackground = true, name = "Lista com tarefas")
 @Composable
 private fun ListaTarefasContentPreview() {
@@ -256,6 +331,23 @@ private fun ConfirmarExclusaoDialogPreview() {
         tarefa = Tarefa(id = 1, titulo = "Estudar Room", descricao = "Revisar anotações e DAO"),
         onConfirmar = {},
         onCancelar = {}
+    )
+}
+
+@Preview(showBackground = true, name = "Confirmação de exclusão das concluídas")
+@Composable
+private fun ListaTarefasConfirmacaoExclusaoConcluidasPreview() {
+    ListaTarefasContent(
+        tarefas = listOf(
+            Tarefa(id = 1, titulo = "Estudar Room", descricao = "Revisar anotações e DAO", concluida = false),
+            Tarefa(id = 2, titulo = "Enviar atividade", descricao = "Upload no portal da FIAP", concluida = true),
+            Tarefa(id = 3, titulo = "Comprar caderno", descricao = "Papelaria perto da FIAP", concluida = true)
+        ),
+        onNovaTarefa = {},
+        onEditarTarefa = {},
+        onCheckedChange = { _, _ -> },
+        onDeletar = {},
+        confirmandoExclusaoConcluidas = true
     )
 }
 
