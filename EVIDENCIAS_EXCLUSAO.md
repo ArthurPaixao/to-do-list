@@ -32,9 +32,38 @@ Tocando em **Excluir**, o diálogo fecha e somente **Revisar arquitetura MVVM** 
 
 <img src="docs/images/exclusao/05-resultado-apos-excluir.png" alt="Lista após confirmar a exclusão" width="300">
 
+## Extra: exclusão das tarefas concluídas
+
+Além da exclusão individual, a barra superior mostra a ação **Limpar concluídas** sempre que existe ao menos uma tarefa concluída. Ela também passa por um diálogo de confirmação sobre a lista.
+
+### 6. Lista com tarefas concluídas
+
+Duas tarefas concluídas (riscadas) e duas pendentes.
+
+<img src="docs/images/exclusao/06-lista-com-concluidas.png" alt="Lista com tarefas concluídas" width="300">
+
+### 7. Diálogo listando as tarefas concluídas
+
+Ao tocar em **Limpar concluídas**, o diálogo informa quantas tarefas serão excluídas e mostra o título de cada uma.
+
+<img src="docs/images/exclusao/07-dialogo-concluidas.png" alt="Diálogo de exclusão das concluídas" width="300">
+
+### 8. Resultado ao cancelar
+
+Tocando em **Cancelar**, nada é removido.
+
+<img src="docs/images/exclusao/08-concluidas-ao-cancelar.png" alt="Lista após cancelar a exclusão das concluídas" width="300">
+
+### 9. Resultado após confirmar
+
+Tocando em **Excluir**, apenas as tarefas concluídas são removidas e a ação **Limpar concluídas** some da barra.
+
+<img src="docs/images/exclusao/09-concluidas-apos-excluir.png" alt="Lista após excluir as concluídas" width="300">
+
 ## Resumo da implementação
 
 - `TarefaViewModel` guarda a tarefa selecionada em `tarefaParaExcluir` (`StateFlow<Tarefa?>`) e expõe `solicitarExclusao`, `cancelarExclusao` e `confirmarExclusao`.
 - `ListaTarefasScreen` observa esse estado e exibe o `ConfirmarExclusaoDialog` sobre a própria lista, sem nova rota de navegação.
-- Previews adicionadas: **Confirmação de exclusão** (lista com o diálogo aberto) e **Diálogo de exclusão**.
-- Testes de UI em `ListaTarefasExclusaoTest` cobrem o cancelamento e a exclusão apenas da tarefa selecionada.
+- Para as concluídas, `TarefaDao.deletarConcluidas()` executa `DELETE FROM tarefas WHERE concluida = 1`, exposto pelo `TarefaRepository`. O `TarefaViewModel` controla o diálogo com `confirmandoExclusaoConcluidas` e as funções `solicitarExclusaoConcluidas`, `cancelarExclusaoConcluidas` e `confirmarExclusaoConcluidas`.
+- Previews adicionadas: **Confirmação de exclusão** (lista com o diálogo aberto), **Diálogo de exclusão** e **Confirmação de exclusão das concluídas**.
+- Testes de UI em `ListaTarefasExclusaoTest` e `ListaTarefasExclusaoConcluidasTest` cobrem cancelar e confirmar nos dois fluxos. `TarefaDaoTest` ganhou `deletarConcluidasMantemTarefasPendentes`.
