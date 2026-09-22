@@ -13,4 +13,6 @@ class TarefaRepository(private val dao: TarefaDao) {
     suspend fun atualizar(tarefa: Tarefa) = dao.atualizar(tarefa)
 
     suspend fun deletar(tarefa: Tarefa) = dao.deletar(tarefa)
+
+    suspend fun deletarConcluidas() = dao.deletarConcluidas()
 }

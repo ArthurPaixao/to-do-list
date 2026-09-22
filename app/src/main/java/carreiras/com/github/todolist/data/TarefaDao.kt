@@ -24,4 +24,7 @@ interface TarefaDao {
 
     @Delete
     suspend fun deletar(tarefa: Tarefa)
+
+    @Query("DELETE FROM tarefas WHERE concluida = 1")
+    suspend fun deletarConcluidas()
 }

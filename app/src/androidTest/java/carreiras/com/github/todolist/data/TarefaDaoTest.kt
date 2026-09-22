@@ -67,6 +67,19 @@ class TarefaDaoTest {
     }
 
     @Test
+    fun deletarConcluidasMantemTarefasPendentes() = runTest {
+        dao.inserir(Tarefa(titulo = "Pendente", descricao = ""))
+        dao.inserir(Tarefa(titulo = "Concluida 1", descricao = "", concluida = true))
+        dao.inserir(Tarefa(titulo = "Concluida 2", descricao = "", concluida = true))
+
+        dao.deletarConcluidas()
+
+        val tarefas = dao.listarTodas().first()
+        assertEquals(1, tarefas.size)
+        assertEquals("Pendente", tarefas[0].titulo)
+    }
+
+    @Test
     fun tarefasComPrazoAparecemAntesDeAvulsasEOrdenadasPorProximidade() = runTest {
         val agora = System.currentTimeMillis()
         dao.inserir(Tarefa(titulo = "Avulsa", descricao = ""))
