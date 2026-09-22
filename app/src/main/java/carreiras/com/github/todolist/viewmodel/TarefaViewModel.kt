@@ -46,6 +46,22 @@ class TarefaViewModel(private val repository: TarefaRepository) : ViewModel() {
         deletar(tarefa)
     }
 
+    private val _confirmandoExclusaoConcluidas = MutableStateFlow(false)
+    val confirmandoExclusaoConcluidas: StateFlow<Boolean> = _confirmandoExclusaoConcluidas.asStateFlow()
+
+    fun solicitarExclusaoConcluidas() {
+        _confirmandoExclusaoConcluidas.value = true
+    }
+
+    fun cancelarExclusaoConcluidas() {
+        _confirmandoExclusaoConcluidas.value = false
+    }
+
+    fun confirmarExclusaoConcluidas() {
+        _confirmandoExclusaoConcluidas.value = false
+        viewModelScope.launch { repository.deletarConcluidas() }
+    }
+
     companion object {
         fun factory(context: Context): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
