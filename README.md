@@ -10,7 +10,7 @@ Aplicativo Android de lista de tarefas (to-do list) desenvolvido como projeto di
 
 ## Funcionalidades
 
-- Criar, editar e excluir tarefas
+- Criar, editar e excluir tarefas, com diálogo de confirmação antes da exclusão
 - Marcar tarefas como concluídas
 - Definir data e horário de prazo para uma tarefa
 - Lista ordenada por prazo, com destaque visual para tarefas atrasadas
