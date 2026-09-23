@@ -53,7 +53,8 @@ Uma explicação detalhada e comparada da arquitetura (MVC, MVP, MVI e MVVM), co
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/carreiras/fiap-to-do-list.git
+   git clone https://github.com/ArthurPaixao/to-do-list.git
+   cd to-do-list
    ```
 2. Abra a pasta do projeto no Android Studio e aguarde a sincronização do Gradle.
 3. Selecione um emulador ou conecte um dispositivo físico.
@@ -83,7 +84,9 @@ O app tem duas telas, conectadas via Navigation Compose e compartilhando a mesma
 
 ## Autor
 
-Ewerton Carreira
+Arthur Paixão — implementação da confirmação de exclusão de tarefas ([EVIDENCIAS_EXCLUSAO.md](EVIDENCIAS_EXCLUSAO.md)).
+
+Projeto base desenvolvido por Ewerton Carreira.
 
 ## Licença
 
